@@ -73,7 +73,7 @@ class Books(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE,null=True,blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     books_name = models.CharField(max_length=500, null=True, blank=True, verbose_name="Название книги")
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Цена")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
     description = models.TextField(null=True,blank=True)
     bestseller = models.BooleanField(default=False, verbose_name="Бестселлер")
 
