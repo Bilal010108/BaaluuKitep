@@ -15,8 +15,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
-      - ./static:/core/staticfiles/
-      - ./media:/core/media/
+
     ports:
       - "8000:8000"
     depends_on:
