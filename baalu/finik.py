@@ -48,13 +48,12 @@ def create_finik_payment(order):
         "Amount": int(order.total_price),
         "CardType": "FINIK_QR",
         "PaymentId": str(order.id),
-        "RedirectUrl": "https://baalu.kg/payment/success",
+        "RedirectUrl": "https://baaluu.kg/payment/success",
         "Data": {
             "accountId": ACCOUNT_ID,
             "merchantCategoryCode": FINIK_MCC,
-            "name_en": "Baalu Books",
-            "description": f"Заказ #{order.id}",
-        }
+            "name_en": "Baaluu Books",
+            "description": f"Заказ №{order.id} Книги: {', '.join(f'{item.books.books_name} x{item.quantity}' for item in order.items.all())}",        }
     }
 
     # Официальный Signer от Finik — строит canonical string правильно
@@ -165,7 +164,7 @@ def handle_payment_success(payment):
             f'Привет, {order.user.username}!\n\n'
             f'Ваш заказ #{order.id} на сумму {order.total_price} сом успешно оплачен.\n'
             f'Адрес доставки: {order.address}\n\n'
-            f'Спасибо за покупку в Baalu Books!'
+            f'Спасибо за покупку в Baaluu Books!'
         ),
         from_email=os.getenv('EMAIL_HOST_USER'),
         recipient_list=[order.user.email],
