@@ -43,7 +43,7 @@ services:
       - lets:/config
       - ./nginx/ssl.conf:/config/nginx/site-confs/ssl/ssl.conf
       - ./nginx/nginx.conf:/config/nginx/site-confs/default.conf
-      - ./static_volume:/app/staticfiles
+      - ./staticfiles:/app/staticfiles
       - ./media:/app/media
 
 volumes:
