@@ -46,7 +46,7 @@ services:
       - ./nginx/ssl.conf:/config/nginx/site-confs/ssl/ssl.conf
       - ./nginx/nginx.conf:/config/nginx/site-confs/default.conf
       - ./staticfiles:/app/staticfiles
-      - ./media:/core/media/
+      - ./media:/app/media
 
 volumes:
   postgres_data:
