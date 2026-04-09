@@ -15,6 +15,8 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
 
     ports:
       - "8000:8000"
@@ -44,9 +46,11 @@ services:
       - lets:/config
       - ./nginx/ssl.conf:/config/nginx/site-confs/ssl/ssl.conf
       - ./nginx/nginx.conf:/config/nginx/site-confs/default.conf
-      - ./staticfiles:/app/staticfiles
+      - ./static_volume:/app/staticfiles
       - ./media:/app/media
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
   lets:
