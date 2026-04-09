@@ -151,6 +151,8 @@ class StoreDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Store.objects.none()
         return Store.objects.filter(store_owner=self.request.user)
 
 

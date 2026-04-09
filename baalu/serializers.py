@@ -195,7 +195,7 @@ class StoreListSerializers(serializers.ModelSerializer):
 class StoreDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
-        fields = ('id','store_name','store_image','is_active', 'contacts_store','store_description','social_network')
+        fields = ('id','store_name','store_image','is_active','store_description','social_network','contact_number')
 
 
 class CategoryCreateSerializer(serializers.ModelSerializer):
