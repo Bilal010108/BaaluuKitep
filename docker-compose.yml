@@ -34,12 +34,8 @@ services:
       - URL=baaluukitep.com.kg
       - SUBDOMAINS=api
       - VALIDATION=http
-<<<<<<< HEAD
-      - STAGING=true
-=======
       - ONLY_SUBDOMAINS=true
-      - STAGING=false
->>>>>>> 0d7a566c996506d34de43753a667355da25a074c
+      - STAGING=true
     depends_on:
       - web
     ports:
@@ -49,7 +45,7 @@ services:
       - lets:/config
       - ./nginx/ssl.conf:/config/nginx/site-confs/ssl/ssl.conf
       - ./nginx/nginx.conf:/config/nginx/site-confs/default.conf
-      - ./static:/core/static/
+      - ./staticfiles:/app/staticfiles
       - ./media:/core/media/
 
 volumes:
