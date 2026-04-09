@@ -34,7 +34,7 @@ services:
       - SUBDOMAINS=api
       - VALIDATION=http
       - ONLY_SUBDOMAINS=true
-      - STAGING=true
+      - STAGING=false
     depends_on:
       - web
     ports:
