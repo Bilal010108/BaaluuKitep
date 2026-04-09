@@ -34,6 +34,7 @@ services:
       - URL=baaluukitep.com.kg
       - SUBDOMAINS=api
       - VALIDATION=http
+      - ONLY_SUBDOMAINS=true
       - STAGING=false
     depends_on:
       - web
