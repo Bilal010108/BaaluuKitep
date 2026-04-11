@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'django_filters',
     'django_rest_passwordreset',
 
-
 ]
 
 MIDDLEWARE = [
@@ -62,7 +61,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.locale.LocaleMiddleware'
+    'django.middleware.locale.LocaleMiddleware',
+
 ]
 
 
@@ -217,7 +217,6 @@ CORS_ALLOW_HEADERS = [
 ]
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -234,3 +233,5 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Добро пожаловать, Майрамбек",
     "theme": "darkly",
 }
+
+

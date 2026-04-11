@@ -264,7 +264,7 @@ class BooksListSerializer(serializers.ModelSerializer):
     good_rate = serializers.SerializerMethodField()
     class Meta:
         model = Books
-        fields = ['id', 'books_name', 'author', 'price', 'sales', 'avg_rating', 'images','count_rating','good_rate']
+        fields = ['id', 'books_name', 'author', 'price', 'sales', 'avg_rating', 'images','count_rating','good_rate','bestseller']
 
 
     def get_avg_rating(self, obj):
