@@ -330,7 +330,7 @@ class ReviewSerializers(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'user_reviews', 'books', 'rating', 'comment',
-                  'likes_count', 'created_at', 'replies', 'parent', 'books_id')
+                  'created_at', 'likes_count', 'replies', 'parent', 'books_id')
 
 
     def get_replies(self, obj):
