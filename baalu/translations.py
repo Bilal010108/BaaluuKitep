@@ -4,7 +4,7 @@ from modeltranslation.translator import TranslationOptions,register
 
 @register(Store)
 class StoreTranslationOptions(TranslationOptions):
-    fields = ('store_name', 'store_region', 'store_description')
+    fields = ('store_name', 'store_description')
 
 
 @register(Category)
@@ -14,7 +14,7 @@ class CategoryTranslationOptions(TranslationOptions):
 
 @register(Books)
 class BooksTranslationOptions(TranslationOptions):
-    fields = ('books_name',)
+    fields = ('books_name','description')
 
 
 @register(Reklama)
