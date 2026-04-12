@@ -34,6 +34,7 @@ urlpatterns = [
     path('books/', BooksListAPIView.as_view(), name='product-list'),
     path('books_create/', BooksCreateAPIView.as_view(), name='product-create'),
     path('books/<int:pk>/', BooksDetailAPIView.as_view(), name='product-detail'),
+    path('books/<int:pk>/position/', BookPositionUpdateView.as_view()),
 
     path('bookimage/', BookImageListAPIView.as_view(), name='bookimage_image-create'),
     path('bookimage/<int:pk>/', BookImageDetailAPIView.as_view(), name='bookimage_image-detail'),

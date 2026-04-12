@@ -198,6 +198,10 @@ class BooksListAPIView(generics.ListAPIView):
     search_fields = ['books_name', 'author', 'izdatelstvo']
     ordering_fields = ['price', 'god_izdaniya']
 
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response.data['total_books'] = Books.objects.count()
+        return response
 
 class BooksDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Books.objects.all()
@@ -215,6 +219,32 @@ class BookImageDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BookImages.objects.all()
     serializer_class = BookImgSerializer
 
+
+class BookPositionUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            book = Books.objects.get(pk=pk)
+        except Books.DoesNotExist:
+            return Response({'error': 'Книга не найдена'}, status=404)
+
+        new_position = request.data.get('position')
+        if new_position is None:
+            return Response({'error': 'Укажите position'}, status=400)
+
+        old_position = book.position
+
+        # Временно ставим 9999 чтобы не было одинаковых позиций
+        Books.objects.filter(pk=pk).update(position=9999)
+
+        # Книге на новой позиции даём старую позицию
+        Books.objects.filter(position=new_position).exclude(pk=pk).update(position=old_position)
+
+        # Теперь ставим нашей книге новую позицию
+        Books.objects.filter(pk=pk).update(position=new_position)
+
+        return Response({'message': f'Позиция изменена: {old_position} ↔ {new_position}'})
 
 # ─── Sale ──────────────────────────────────────────────────────────────────────
 

@@ -100,7 +100,9 @@ class Books(models.Model):
     isbn = models.CharField(max_length=64, null=True, blank=True, verbose_name="ISBN")
     tirazh = models.IntegerField(null=True, blank=True, verbose_name="Тираж")
     yazyk = models.CharField(max_length=64, null=True, blank=True, verbose_name="Язык")
-    artikul = models.CharField(max_length=64, null=True, blank=True, verbose_name="Артикул", unique=True)
+    artikul = models.CharField(max_length=64, null=True, blank=True, verbose_name="Артикул",)
+    position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
+
 
 
     @property
@@ -136,8 +138,23 @@ class Books(models.Model):
 
         return self.price
 
+    def save(self, *args, **kwargs):
+        if not self.pk:  # только при создании
+            last = Books.objects.order_by('position').last()
+            if last and last.position:
+                self.position = last.position + 1
+            else:
+                self.position = 1
+        super().save(*args, **kwargs)
+
+
+
     def __str__(self):
         return str(self.books_name)
+
+    class Meta:
+        ordering = ['position']
+
 
 
 class Sale(models.Model):
