@@ -205,19 +205,34 @@ class CategoryCreateSerializer(serializers.ModelSerializer):
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
+    books_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
-        fields = ['id', 'category_name','category_icon']
+        fields = ['id', 'category_name','books_count']
+
+    def get_books_count(self, obj):
+        return obj.books_set.count()
+
 
 class CategorySimpleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'category_name']
+        fields = ['id', 'category_name',]
+
+
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
+    books_count = serializers.SerializerMethodField()
+
+
     class Meta:
         model = Category
-        fields = ['id','category_name',]
+        fields = ['id','category_name','books_count']
+
+    def get_books_count(self, obj):
+        return obj.books_set.count()
+
 
 
 class BookImgSerializer(serializers.ModelSerializer):
@@ -264,7 +279,7 @@ class BooksListSerializer(serializers.ModelSerializer):
     good_rate = serializers.SerializerMethodField()
     class Meta:
         model = Books
-        fields = ['id', 'books_name', 'author', 'price', 'sales', 'avg_rating', 'images','count_rating','good_rate','bestseller']
+        fields = ['id', 'books_name', 'author', 'price', 'sales', 'avg_rating', 'images','count_rating','good_rate','bestseller','position']
 
 
     def get_avg_rating(self, obj):
@@ -275,6 +290,8 @@ class BooksListSerializer(serializers.ModelSerializer):
 
     def get_good_rate(self, obj):
         return obj.good_rate
+
+
 
 
 class SaleCreateSerializer(serializers.ModelSerializer):
@@ -370,7 +387,7 @@ class BooksDetailSerializer(serializers.ModelSerializer):
         fields = ['books_name', 'price', 'bestseller', 'v_nalich', 'author', 'izdatelstvo', 'god_izdaniya',
                  'kolichestvo_stranits', 'format_knigi', 'age_limit', 'pereplet', 'isbn', 'tirazh', 'yazyk',
                   'artikul', 'avg_rating', 'count_rating', 'good_rate', 'actual_price', 'category',
-                  'sales', 'review_books','images','description']
+                  'sales', 'review_books','images','description','position']
 
 
     def get_avg_rating(self, obj):

@@ -14,7 +14,7 @@ class CategoryTranslationOptions(TranslationOptions):
 
 @register(Books)
 class BooksTranslationOptions(TranslationOptions):
-    fields = ('books_name','description')
+    fields = ('books_name','description',)
 
 
 @register(Reklama)
