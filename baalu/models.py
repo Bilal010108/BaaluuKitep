@@ -64,10 +64,23 @@ class Store(models.Model):
 class Category(models.Model):
     category_name = models.CharField(max_length=500)
     category_icon =  models.ImageField(upload_to='category_icon/', null=True, blank=True)
+    position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # только при создании
+            last = Books.objects.order_by('position').last()
+            if last and last.position:
+                self.position = last.position + 1
+            else:
+                self.position = 1
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.category_name
 
+    class Meta:
+        ordering = ['position']
 
 class Books(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE,null=True,blank=True)
@@ -209,9 +222,23 @@ class Reklama(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Активный')
     created_at = models.DateTimeField(auto_now_add=True)
+    position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
+
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # только при создании
+            last = Books.objects.order_by('position').last()
+            if last and last.position:
+                self.position = last.position + 1
+            else:
+                self.position = 1
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ['position']
 
 
 class PromoCode(models.Model):

@@ -228,7 +228,7 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id','category_name','books_count']
+        fields = ['id','category_name','books_count','position']
 
     def get_books_count(self, obj):
         return obj.books_set.count()
@@ -424,7 +424,7 @@ class ReklamaListSerializer(serializers.ModelSerializer):
 class ReklamaDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reklama
-        fields = ['title', 'description', 'image', 'link', 'status', 'created_at','books_reklama']
+        fields = ['title', 'description', 'image', 'link', 'status', 'created_at','books_reklama','position']
 
 
 class PromoCodeCreateSerializer(serializers.ModelSerializer):

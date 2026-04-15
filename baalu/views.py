@@ -160,8 +160,7 @@ class StoreDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 class CategoryCreateAPIView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
-    serializer_class = CategoryListSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    serializer_class = CategoryCreateSerializer
 
 
 class CategoryListAPIView(generics.ListAPIView):
@@ -172,7 +171,6 @@ class CategoryListAPIView(generics.ListAPIView):
 class CategoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategoryListSerializer
-    parser_classes = [MultiPartParser, FormParser]
 
 
 # ─── Books ─────────────────────────────────────────────────────────────────────
