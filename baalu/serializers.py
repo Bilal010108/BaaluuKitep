@@ -279,7 +279,7 @@ class BooksListSerializer(serializers.ModelSerializer):
     good_rate = serializers.SerializerMethodField()
     class Meta:
         model = Books
-        fields = ['id', 'books_name', 'author', 'price', 'sales', 'avg_rating', 'images','count_rating','good_rate','bestseller','position']
+        fields = ['id', 'books_name', 'author', 'price', 'sales', 'avg_rating', 'images','count_rating','good_rate','bestseller','position',]
 
 
     def get_avg_rating(self, obj):
@@ -387,7 +387,7 @@ class BooksDetailSerializer(serializers.ModelSerializer):
         fields = ['books_name', 'price', 'bestseller', 'v_nalich', 'author', 'izdatelstvo', 'god_izdaniya',
                  'kolichestvo_stranits', 'format_knigi', 'age_limit', 'pereplet', 'isbn', 'tirazh', 'yazyk',
                   'artikul', 'avg_rating', 'count_rating', 'good_rate', 'actual_price', 'category',
-                  'sales', 'review_books','images','description','position']
+                  'sales', 'review_books','images','description','position',]
 
 
     def get_avg_rating(self, obj):
@@ -414,22 +414,24 @@ class ReklamaCreateSerializer(serializers.ModelSerializer):
 
 
 class ReklamaListSerializer(serializers.ModelSerializer):
+    book_id = serializers.IntegerField(source='books_reklama.id', read_only=True)
+    book_name = serializers.CharField(source='books_reklama.books_name', read_only=True)
     class Meta:
         model = Reklama
-        fields = ['id', 'title', 'description', 'image', 'link']
+        fields = ['id', 'title', 'description', 'image', 'link','books_reklama','book_id','book_name']
 
 
 class ReklamaDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reklama
-        fields = ['title', 'description', 'image', 'link', 'status', 'created_at']
+        fields = ['title', 'description', 'image', 'link', 'status', 'created_at','books_reklama']
 
 
 class PromoCodeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PromoCode
         fields  = '__all__'
-        read_only_fields = ['seller', 'is_used', 'used_by']
+        read_only_fields = ['seller', 'is_used', 'used_by',]
 
 
 class PromoCodeListSerializer(serializers.ModelSerializer):
