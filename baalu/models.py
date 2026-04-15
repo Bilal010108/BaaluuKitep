@@ -428,7 +428,7 @@ class CommentLike(models.Model):
 class Payment(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
     finik_payment_id = models.CharField(max_length=255, unique=True)
-    qr_url = models.URLField(null=True, blank=True)
+    qr_url = models.URLField(max_length=800,null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(
         max_length=20,
