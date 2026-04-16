@@ -102,7 +102,7 @@ class Books(models.Model):
     god_izdaniya = models.IntegerField(null=True, blank=True, verbose_name="Год издания")
     kolichestvo_stranits = models.IntegerField(null=True, blank=True, verbose_name="Количество страниц")
     format_knigi = models.CharField(max_length=100, null=True, blank=True, verbose_name="Формат")
-    age_limit =  models.PositiveSmallIntegerField(validators=[ MinValueValidator(1),MaxValueValidator(90)],null=True, blank=True)
+    age_limit =  models.PositiveSmallIntegerField(validators=[ MinValueValidator(0),MaxValueValidator(90)],null=True, blank=True)
 
 
     PEREPLET_CHOICES = (
