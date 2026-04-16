@@ -385,8 +385,8 @@ class BooksDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Books
         fields = ['books_name', 'price', 'bestseller', 'v_nalich', 'author', 'izdatelstvo', 'god_izdaniya',
-                 'kolichestvo_stranits', 'format_knigi', 'age_limit', 'pereplet', 'isbn', 'tirazh', 'yazyk',
-                  'artikul', 'avg_rating', 'count_rating', 'good_rate', 'actual_price', 'category',
+                 'kolichestvo_stranits', 'format_knigi', 'age_limit', 'pereplet', 'isbn', 'yazyk',
+                 'avg_rating', 'count_rating', 'good_rate', 'actual_price', 'category',
                   'sales', 'review_books','images','description','position',]
 
 

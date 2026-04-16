@@ -2,21 +2,53 @@ from django.contrib import admin
 from .models import *
 from modeltranslation.admin import TranslationAdmin
 from .translations import *
+from django.utils.html import format_html
 
+#
+# class BookImageInline(admin.TabularInline):
+#     model = BookImages
+#     extra = 1
 
 class BookImageInline(admin.TabularInline):
     model = BookImages
     extra = 1
+    readonly_fields = ('image_preview',)
+    fields = ('books_image', 'image_preview',)
+
+    def image_preview(self, obj):
+        if obj.books_image:
+            return format_html(
+                '<img src="{}" style="max-height: 90px;"/>',
+                obj.books_image.url
+            )
+        return "Нет фото"
+
+    image_preview.short_description = 'Фото'
 
 
 @admin.register(Books)
 class BooksAdmin(TranslationAdmin):
     inlines = [BookImageInline]
-    list_display = ['books_name', 'position', 'category', 'price',]
-    list_editable = ['position','category','price']
+    list_display = ['image_preview','books_name', 'position', 'category', 'price',]
+    list_editable = ['position','category','price',]
     list_filter = ['category',]
     search_fields = ['books_name', 'author', 'isbn', 'artikul']
     list_per_page = 20
+
+    def image_preview(self, obj):
+        image = obj.images.first()
+        if image and image.books_image:
+            return format_html(
+                '<img src="{}" style="height: 80px;" />',
+                image.books_image.url
+            )
+        return '—'
+
+    image_preview.short_description = 'Фото'
+
+
+
+
     class Media:
         js = (
             'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
@@ -26,6 +58,7 @@ class BooksAdmin(TranslationAdmin):
         css = {
             'screen': ('modeltranslation/css/tabbed_translation_fields.css',),
         }
+
 
 
 @admin.register(Store)
@@ -44,6 +77,13 @@ class StoreAdmin(TranslationAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(TranslationAdmin):
+    list_display = ['category_name','position']
+    list_editable = ['position',]
+    search_fields = ['category_name',]
+    list_per_page = 20
+
+
+
     class Media:
         js = (
             'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',

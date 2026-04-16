@@ -63,7 +63,6 @@ class Store(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=500)
-    category_icon =  models.ImageField(upload_to='category_icon/', null=True, blank=True)
     position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
 
     def save(self, *args, **kwargs):
@@ -111,9 +110,7 @@ class Books(models.Model):
     )
     pereplet = models.CharField(max_length=16, choices=PEREPLET_CHOICES, null=True, blank=True, verbose_name="Переплет")
     isbn = models.CharField(max_length=64, null=True, blank=True, verbose_name="ISBN")
-    tirazh = models.IntegerField(null=True, blank=True, verbose_name="Тираж")
     yazyk = models.CharField(max_length=64, null=True, blank=True, verbose_name="Язык")
-    artikul = models.CharField(max_length=64, null=True, blank=True, verbose_name="Артикул",)
     position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
 
 

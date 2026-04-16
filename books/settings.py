@@ -86,7 +86,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'books.wsgi.application'
-
+#
 #
 # DATABASES = {
 #     'default': {
@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'books.wsgi.application'
 #         'PORT': os.getenv('DB_PORT', ''),
 #     }
 # }
-
+#
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
