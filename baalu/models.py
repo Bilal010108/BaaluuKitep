@@ -122,8 +122,8 @@ class Books(models.Model):
 
     def get_count_rating(self):
         count = self.review_books.count()
-        if count > 3:
-            return '3+'
+        if count > 500:
+            return '500+'
         return count
 
     @property

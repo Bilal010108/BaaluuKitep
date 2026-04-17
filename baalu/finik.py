@@ -48,12 +48,15 @@ def create_finik_payment(order):
         "Amount": int(order.total_price),
         "CardType": "FINIK_QR",
         "PaymentId": str(order.id),
-        "RedirectUrl": "https://baaluu.kg/payment/success",
+        "RedirectUrl": "https://baaluukitep.kg/",
         "Data": {
             "accountId": ACCOUNT_ID,
             "merchantCategoryCode": FINIK_MCC,
             "name_en": "Baaluu Books",
-            "description": f"Заказ №{order.id} Книги: {', '.join(f'{item.books.books_name} x{item.quantity}' for item in order.items.all())}",        }
+            "description": f"Заказ №{order.id} Книги: {', '.join(f'{item.books.books_name} x{item.quantity}' for item in order.items.all())}",
+            "webhookUrl": 'https://api.baaluukitep.com.kg/ru/lpayment/webhook/,'
+        }
+
     }
 
     # Официальный Signer от Finik — строит canonical string правильно
