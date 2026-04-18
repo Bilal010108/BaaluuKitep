@@ -517,7 +517,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = (
-            'id', 'status','total_price','created_at','items','phone_number','address','promo_code')
+            'id', 'status','total_price','created_at','items','phone_number','address','promo_code','region')
 
     def get_discount_percent(self, obj):
         if obj.promo_code:

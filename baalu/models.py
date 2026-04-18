@@ -332,7 +332,7 @@ class Order(models.Model):
     STATUS_CHOICES = (
         ('Ожидании', 'Ожидании'),
         ('Отправлен', 'Отправлен'),
-        ('Доставлен', 'Доставлен'),
+        ('Оплачен', 'Оплачен'),
         ('Отменён', 'Отменён'),
     )
 
@@ -341,6 +341,13 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     phone_number = PhoneNumberField(null=True, blank=True)
     address = models.CharField(max_length=500, null=True, blank=True)
+    REGION_CHOICES = (
+        ('Ош', 'Ош'),
+        ('Бишкек', 'Бишкек'),
+    )
+    region = models.CharField(max_length=20, choices=REGION_CHOICES, default='Ожидании')
+
+
 
     def __str__(self):
         return f'Order #{self.id} - {self.user.username}'
@@ -411,27 +418,6 @@ class CommentLike(models.Model):
     def __str__(self):
         return f'{self.user} - {self.review}'
 
-
-
-#
-# class Payment(models.Model):
-#     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
-#     finik_payment_id = models.CharField(max_length=255, unique=True)
-#     qr_url = models.URLField(max_length=800,null=True, blank=True)
-#     amount = models.DecimalField(max_digits=10, decimal_places=2)
-#     status = models.CharField(
-#         max_length=20,
-#         choices=[
-#             ('PENDING', 'PENDING'),
-#             ('PAID', 'PAID'),
-#             ('REJECTED', 'REJECTED')
-#         ],
-#         default='PENDING'
-#     )
-#     paid_at = models.DateTimeField(null=True, blank=True)
-#
-#     def __str__(self):
-#         return f'Payment for Order #{self.order.id} - {self.status}'
 
 class FinikPrePayment(models.Model):
     class Status(models.TextChoices):

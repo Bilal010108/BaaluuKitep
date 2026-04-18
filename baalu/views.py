@@ -403,10 +403,12 @@ class CreateOrderAPIView(generics.CreateAPIView):
     def post(self, request):
         phone_number = request.data.get('phone_number')
         address = request.data.get('address')
+        region = request.data.get('region')
 
-        if not phone_number or not address:
+
+        if not phone_number or not address or not region:
             return Response(
-                {'error': 'Укажите телефон и адрес доставки'},
+                {'error': 'Укажите телефон,регион и адрес доставки'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
@@ -443,7 +445,7 @@ class SellerOrderUpdateView(generics.RetrieveUpdateAPIView):
     def patch(self, request, *args, **kwargs):
         order = self.get_object()
         new_status = request.data.get('status')
-        allowed = ['Ожидании', 'Отправлен', 'Доставлен', 'Отменён']
+        allowed = ['Ожидании', 'Отправлен', 'Оплачен', 'Отменён']
         if new_status not in allowed:
             return Response({'error': 'Неверный статус'}, status=400)
         order.status = new_status
@@ -477,108 +479,7 @@ class CommentListAPIView(generics.ListCreateAPIView):
     serializer_class = CommentLikeSerializer
 
 
-# ─── Payment (Finik) ───────────────────────────────────────────────────────────
-#
-# class CreatePaymentView(APIView):
-#     """
-#     POST /orders/<order_id>/pay/
-#     Создаёт QR-платёж в Finik и возвращает ссылку на оплату.
-#     """
-#     permission_classes = [IsAuthenticated]
-#
-#     def post(self, request, order_id):
-#         try:
-#             order = Order.objects.get(id=order_id, user=request.user)
-#         except Order.DoesNotExist:
-#             return Response({'error': 'Заказ не найден'}, status=404)
-#
-#         if hasattr(order, 'payment') and order.payment.status == 'PAID':
-#             return Response({'error': 'Заказ уже оплачен'}, status=400)
-#
-#         try:
-#             payment_url, payment_id = create_finik_payment(order)
-#         except Exception as e:
-#             return Response({'error': str(e)}, status=502)
-#
-#         Payment.objects.update_or_create(
-#             order=order,
-#             defaults={
-#                 'finik_payment_id': payment_id,
-#                 'qr_url': payment_url,
-#                 'amount': order.total_price,
-#                 'status': 'PENDING',
-#             }
-#         )
-#
-#         return Response({'payment_url': payment_url}, status=201)
-#
-#
-# class PaymentStatusView(APIView):
-#     """
-#     GET /orders/<order_id>/payment-status/
-#     Фронт опрашивает каждые несколько секунд чтобы узнать статус оплаты.
-#     """
-#     permission_classes = [IsAuthenticated]
-#
-#     def get(self, request, order_id):
-#         try:
-#             order = Order.objects.get(id=order_id, user=request.user)
-#             payment = order.payment
-#         except (Order.DoesNotExist, Payment.DoesNotExist):
-#             return Response({'error': 'Платёж не найден'}, status=404)
-#
-#         return Response({
-#             'status': payment.status,
-#             'paid_at': payment.paid_at,
-#             'amount': str(payment.amount),
-#         })
-#
-#
-# @csrf_exempt
-# def finik_webhook(request):
-#     """
-#     POST /api/payment/webhook/
-#     Finik стучится сюда после завершения оплаты.
-#     """
-#     if request.method != 'POST':
-#         return HttpResponse(status=405)
-#
-#     # 1. Проверяем подпись
-#     is_valid, reason = verify_finik_webhook_signature(request)
-#     if not is_valid:
-#         return HttpResponse(f'Invalid: {reason}', status=403)
-#
-#     try:
-#         data = json.loads(request.body)
-#     except json.JSONDecodeError:
-#         return HttpResponse('Bad JSON', status=400)
-#
-#     transaction_status = data.get('status')          # SUCCEEDED или FAILED
-#     transaction_id     = data.get('transactionId', '')
-#
-#     # 2. Ищем платёж
-#     try:
-#         payment = Payment.objects.select_related('order__user').get(
-#             finik_payment_id=str(data.get('transactionId', ''))
-#         )
-#     except Payment.DoesNotExist:
-#         return HttpResponse('Payment not found', status=404)
-#
-#     # 3. Дедупликация
-#     if payment.status == 'PAID':
-#         return HttpResponse('Already processed', status=200)
-#
-#     # 4. Обновляем статус
-#     if transaction_status == 'SUCCEEDED':
-#         payment.status = 'PAID'
-#         payment.paid_at = timezone.now()
-#         payment.save(update_fields=['status', 'paid_at'])
-#         handle_payment_success(payment)
-#     elif transaction_status == 'FAILED':
-#         payment.status = 'REJECTED'
-#         payment.save(update_fields=['status'])
-#
-#     return HttpResponse('OK', status=200)
+
 
 class CreatePaymentView(APIView):
     permission_classes = [IsAuthenticated]

@@ -3,7 +3,6 @@ from .models import *
 from modeltranslation.admin import TranslationAdmin
 from .translations import *
 from django.utils.html import format_html
-from adminsortable2.admin import SortableAdminMixin
 
 #
 # class BookImageInline(admin.TabularInline):

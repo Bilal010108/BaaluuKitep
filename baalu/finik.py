@@ -104,7 +104,7 @@ def handle_payment_success(pre_payment):
     """После успешной оплаты меняем статус заказа и отправляем email."""
     order = pre_payment.order
     if order:
-        order.status = 'Отправлен'
+        order.status = 'Оплачен'
         order.save(update_fields=['status'])
 
         send_mail(
