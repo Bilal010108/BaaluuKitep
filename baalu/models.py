@@ -66,13 +66,12 @@ class Category(models.Model):
     position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
 
     def save(self, *args, **kwargs):
-        if not self.pk:  # только при создании
-            last = Books.objects.order_by('position').last()
-            if last and last.position:
-                self.position = last.position + 1
-            else:
-                self.position = 1
+        if self.pk is None:
+            last = Category.objects.aggregate(max_pos=models.Max('position'))['max_pos']
+            self.position = (last or 0) + 1
         super().save(*args, **kwargs)
+
+
 
 
     def __str__(self):
@@ -149,12 +148,9 @@ class Books(models.Model):
         return self.price
 
     def save(self, *args, **kwargs):
-        if not self.pk:  # только при создании
-            last = Books.objects.order_by('position').last()
-            if last and last.position:
-                self.position = last.position + 1
-            else:
-                self.position = 1
+        if self.pk is None:
+            last = Books.objects.aggregate(max_pos=models.Max('position'))['max_pos']
+            self.position = (last or 0) + 1
         super().save(*args, **kwargs)
 
 
@@ -221,14 +217,10 @@ class Reklama(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
 
-
     def save(self, *args, **kwargs):
-        if not self.pk:  # только при создании
-            last = Books.objects.order_by('position').last()
-            if last and last.position:
-                self.position = last.position + 1
-            else:
-                self.position = 1
+        if self.pk is None:
+            last = Reklama.objects.aggregate(max_pos=models.Max('position'))['max_pos']
+            self.position = (last or 0) + 1
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -421,22 +413,70 @@ class CommentLike(models.Model):
 
 
 
+#
+# class Payment(models.Model):
+#     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
+#     finik_payment_id = models.CharField(max_length=255, unique=True)
+#     qr_url = models.URLField(max_length=800,null=True, blank=True)
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     status = models.CharField(
+#         max_length=20,
+#         choices=[
+#             ('PENDING', 'PENDING'),
+#             ('PAID', 'PAID'),
+#             ('REJECTED', 'REJECTED')
+#         ],
+#         default='PENDING'
+#     )
+#     paid_at = models.DateTimeField(null=True, blank=True)
+#
+#     def __str__(self):
+#         return f'Payment for Order #{self.order.id} - {self.status}'
 
-class Payment(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
-    finik_payment_id = models.CharField(max_length=255, unique=True)
-    qr_url = models.URLField(max_length=800,null=True, blank=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(
-        max_length=20,
-        choices=[
-            ('PENDING', 'PENDING'),
-            ('PAID', 'PAID'),
-            ('REJECTED', 'REJECTED')
-        ],
-        default='PENDING'
-    )
-    paid_at = models.DateTimeField(null=True, blank=True)
+class FinikPrePayment(models.Model):
+    class Status(models.TextChoices):
+        CREATED = "CREATED", "Создан"
+        REDIRECTED = "REDIRECTED", "Переход к оплате"
+        SUCCESS = "SUCCESS", "Успешно"
+        FAILED = "FAILED", "Ошибка"
+
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="finik_payments", verbose_name="Пользователь")
+    order = models.OneToOneField('Order', on_delete=models.CASCADE, related_name='pre_payment', null=True, blank=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Сумма")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.CREATED, verbose_name="Статус")
+    provider_order_id = models.CharField(max_length=500, blank=True, null=True, verbose_name="ID заказа в Finik")
+    provider_response = models.JSONField(default=dict, blank=True, verbose_name="Ответ от Finik")
+    payment_url = models.URLField(max_length=1000, blank=True, null=True, verbose_name="Ссылка на оплату")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Платёж перед оплатой"
+        verbose_name_plural = verbose_name
+        ordering = ["-created_at"]
 
     def __str__(self):
-        return f'Payment for Order #{self.order.id} - {self.status}'
+        return f"FinikPrePayment {self.id} — {self.amount} ({self.get_status_display()})"
+
+
+class FinikPostPayment(models.Model):
+    STATUS_CHOICES = [
+        ("SUCCESS", "Успешный платёж"),
+        ("FAILED", "Ошибка оплаты"),
+        ("CANCELLED", "Отменён"),
+        ("PENDING", "В обработке"),
+    ]
+    payment_id = models.CharField(max_length=500, verbose_name="ID платежа в Finik")
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, verbose_name="Статус")
+    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Сумма")
+    paying_user = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name="finik_post_payments")
+    raw_data = models.JSONField(verbose_name="Сырой ответ от Finik")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Платёж после оплаты"
+        verbose_name_plural = verbose_name
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"FinikPostPayment {self.payment_id} — {self.status}"

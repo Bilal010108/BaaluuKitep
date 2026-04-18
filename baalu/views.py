@@ -15,29 +15,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.core.exceptions import ValidationError as DjangoValidationError
-
 from .filters import BookFilter
-from .models import (
-    UserProfile, Store, Category, Books, BookImages,
-    Sale, Reklama, PromoCode, Favorite, FavoriteBook,
-    Cart, CartItem, Order, OrderItem, Review, CommentLike, Payment,
-)
-from .serializers import (
-    VerifyResetCodeSerializer, ChangePasswordSerializer, UserProfileSerializer,
-    RegisterSerializer, CustomLoginSerializer, LogoutSerializer,
-    SellerSerializer, ClientSerializer,
-    StoreCreateSerializers, StoreListSerializers, StoreDetailSerializer,
-    CategoryCreateSerializer, CategoryListSerializer, CategoryDetailSerializer,
-    BookCreateSerializer, BooksListSerializer, BooksDetailSerializer,
-    BookImgSerializer, SaleCreateSerializer, SaleListSerializer, SaleDetailSerializer,
-    ReklamaCreateSerializer, ReklamaListSerializer, ReklamaDetailSerializer,
-    PromoCodeCreateSerializer, PromoCodeListSerializer, PromoCodeDetailSerializer,
-    PromoCodeApplySerializer, FavoriteBookSerializer, FavoriteSerializer,
-    CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer,
-    ReviewSerializers, ReviewDetailSerializers, CommentLikeSerializer,
-)
-from .services import create_order_from_cart
-from .finik import create_finik_payment, verify_finik_webhook_signature, handle_payment_success
+from .models import *
+from .serializers import *
+from .services import *
+from .finik import *
+
 
 
 # ─── Reset password ────────────────────────────────────────────────────────────
@@ -495,12 +478,109 @@ class CommentListAPIView(generics.ListCreateAPIView):
 
 
 # ─── Payment (Finik) ───────────────────────────────────────────────────────────
+#
+# class CreatePaymentView(APIView):
+#     """
+#     POST /orders/<order_id>/pay/
+#     Создаёт QR-платёж в Finik и возвращает ссылку на оплату.
+#     """
+#     permission_classes = [IsAuthenticated]
+#
+#     def post(self, request, order_id):
+#         try:
+#             order = Order.objects.get(id=order_id, user=request.user)
+#         except Order.DoesNotExist:
+#             return Response({'error': 'Заказ не найден'}, status=404)
+#
+#         if hasattr(order, 'payment') and order.payment.status == 'PAID':
+#             return Response({'error': 'Заказ уже оплачен'}, status=400)
+#
+#         try:
+#             payment_url, payment_id = create_finik_payment(order)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=502)
+#
+#         Payment.objects.update_or_create(
+#             order=order,
+#             defaults={
+#                 'finik_payment_id': payment_id,
+#                 'qr_url': payment_url,
+#                 'amount': order.total_price,
+#                 'status': 'PENDING',
+#             }
+#         )
+#
+#         return Response({'payment_url': payment_url}, status=201)
+#
+#
+# class PaymentStatusView(APIView):
+#     """
+#     GET /orders/<order_id>/payment-status/
+#     Фронт опрашивает каждые несколько секунд чтобы узнать статус оплаты.
+#     """
+#     permission_classes = [IsAuthenticated]
+#
+#     def get(self, request, order_id):
+#         try:
+#             order = Order.objects.get(id=order_id, user=request.user)
+#             payment = order.payment
+#         except (Order.DoesNotExist, Payment.DoesNotExist):
+#             return Response({'error': 'Платёж не найден'}, status=404)
+#
+#         return Response({
+#             'status': payment.status,
+#             'paid_at': payment.paid_at,
+#             'amount': str(payment.amount),
+#         })
+#
+#
+# @csrf_exempt
+# def finik_webhook(request):
+#     """
+#     POST /api/payment/webhook/
+#     Finik стучится сюда после завершения оплаты.
+#     """
+#     if request.method != 'POST':
+#         return HttpResponse(status=405)
+#
+#     # 1. Проверяем подпись
+#     is_valid, reason = verify_finik_webhook_signature(request)
+#     if not is_valid:
+#         return HttpResponse(f'Invalid: {reason}', status=403)
+#
+#     try:
+#         data = json.loads(request.body)
+#     except json.JSONDecodeError:
+#         return HttpResponse('Bad JSON', status=400)
+#
+#     transaction_status = data.get('status')          # SUCCEEDED или FAILED
+#     transaction_id     = data.get('transactionId', '')
+#
+#     # 2. Ищем платёж
+#     try:
+#         payment = Payment.objects.select_related('order__user').get(
+#             finik_payment_id=str(data.get('transactionId', ''))
+#         )
+#     except Payment.DoesNotExist:
+#         return HttpResponse('Payment not found', status=404)
+#
+#     # 3. Дедупликация
+#     if payment.status == 'PAID':
+#         return HttpResponse('Already processed', status=200)
+#
+#     # 4. Обновляем статус
+#     if transaction_status == 'SUCCEEDED':
+#         payment.status = 'PAID'
+#         payment.paid_at = timezone.now()
+#         payment.save(update_fields=['status', 'paid_at'])
+#         handle_payment_success(payment)
+#     elif transaction_status == 'FAILED':
+#         payment.status = 'REJECTED'
+#         payment.save(update_fields=['status'])
+#
+#     return HttpResponse('OK', status=200)
 
 class CreatePaymentView(APIView):
-    """
-    POST /orders/<order_id>/pay/
-    Создаёт QR-платёж в Finik и возвращает ссылку на оплату.
-    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, order_id):
@@ -509,90 +589,97 @@ class CreatePaymentView(APIView):
         except Order.DoesNotExist:
             return Response({'error': 'Заказ не найден'}, status=404)
 
-        if hasattr(order, 'payment') and order.payment.status == 'PAID':
+        # Проверяем — уже оплачен?
+        pre = FinikPrePayment.objects.filter(order=order).first()
+        if pre and pre.status == FinikPrePayment.Status.SUCCESS:
             return Response({'error': 'Заказ уже оплачен'}, status=400)
 
         try:
-            payment_url, payment_id = create_finik_payment(order)
+            finik = FinikClient()
+            payment_data = finik.create_payment(
+                user=request.user,
+                amount=int(order.total_price),
+                order=order,
+            )
         except Exception as e:
             return Response({'error': str(e)}, status=502)
 
-        Payment.objects.update_or_create(
+        pre_payment, _ = FinikPrePayment.objects.update_or_create(
             order=order,
             defaults={
-                'finik_payment_id': payment_id,
-                'qr_url': payment_url,
+                'user': request.user,
                 'amount': order.total_price,
-                'status': 'PENDING',
+                'provider_order_id': payment_data.get('payment_id'),
+                'provider_response': payment_data,
+                'payment_url': payment_data.get('payment_url'),
+                'status': FinikPrePayment.Status.REDIRECTED,
             }
         )
 
-        return Response({'payment_url': payment_url}, status=201)
+        return Response({'payment_url': payment_data.get('payment_url')}, status=201)
 
 
 class PaymentStatusView(APIView):
-    """
-    GET /orders/<order_id>/payment-status/
-    Фронт опрашивает каждые несколько секунд чтобы узнать статус оплаты.
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, order_id):
         try:
             order = Order.objects.get(id=order_id, user=request.user)
-            payment = order.payment
-        except (Order.DoesNotExist, Payment.DoesNotExist):
+            pre = order.pre_payment
+        except (Order.DoesNotExist, FinikPrePayment.DoesNotExist):
             return Response({'error': 'Платёж не найден'}, status=404)
 
         return Response({
-            'status': payment.status,
-            'paid_at': payment.paid_at,
-            'amount': str(payment.amount),
+            'status': pre.status,
+            'payment_url': pre.payment_url,
+            'amount': str(pre.amount),
         })
 
 
 @csrf_exempt
 def finik_webhook(request):
-    """
-    POST /api/payment/webhook/
-    Finik стучится сюда после завершения оплаты.
-    """
     if request.method != 'POST':
         return HttpResponse(status=405)
-
-    # 1. Проверяем подпись
-    is_valid, reason = verify_finik_webhook_signature(request)
-    if not is_valid:
-        return HttpResponse(f'Invalid: {reason}', status=403)
 
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
         return HttpResponse('Bad JSON', status=400)
 
-    transaction_status = data.get('status')          # SUCCEEDED или FAILED
-    transaction_id     = data.get('transactionId', '')
+    fields = data.get("fields", {})
+    payment_id = fields.get("paymentId") or data.get("transactionId")
+    finik_status = (data.get("status") or "").lower()
 
-    # 2. Ищем платёж
-    try:
-        payment = Payment.objects.select_related('order__user').get(
-            finik_payment_id=str(data.get('transactionId', ''))
-        )
-    except Payment.DoesNotExist:
-        return HttpResponse('Payment not found', status=404)
-
-    # 3. Дедупликация
-    if payment.status == 'PAID':
+    # Дедупликация
+    if FinikPostPayment.objects.filter(payment_id=payment_id, status="SUCCESS").exists():
         return HttpResponse('Already processed', status=200)
 
-    # 4. Обновляем статус
-    if transaction_status == 'SUCCEEDED':
-        payment.status = 'PAID'
-        payment.paid_at = timezone.now()
-        payment.save(update_fields=['status', 'paid_at'])
-        handle_payment_success(payment)
-    elif transaction_status == 'FAILED':
-        payment.status = 'REJECTED'
-        payment.save(update_fields=['status'])
+    # Маппинг статусов
+    status_map = {
+        "succeeded": "SUCCESS",
+        "failed": "FAILED",
+        "cancelled": "CANCELLED",
+        "created": "PENDING",
+    }
+    mapped_status = status_map.get(finik_status, "PENDING")
+
+    post_payment = FinikPostPayment.objects.create(
+        payment_id=payment_id,
+        status=mapped_status,
+        amount=data.get("amount", 0),
+        raw_data=data,
+    )
+
+    pre_payment = FinikPrePayment.objects.filter(provider_order_id=payment_id).first()
+
+    if pre_payment:
+        post_payment.paying_user = pre_payment.user
+        post_payment.save(update_fields=["paying_user"])
+
+        pre_payment.status = mapped_status
+        pre_payment.save(update_fields=["status"])
+
+        if mapped_status == "SUCCESS":
+            handle_payment_success(pre_payment)
 
     return HttpResponse('OK', status=200)
