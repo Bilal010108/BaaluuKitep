@@ -3,6 +3,7 @@ from .models import *
 from modeltranslation.admin import TranslationAdmin
 from .translations import *
 from django.utils.html import format_html
+from adminsortable2.admin import SortableAdminMixin
 
 #
 # class BookImageInline(admin.TabularInline):
@@ -133,7 +134,7 @@ admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(OrderItem)
 admin.site.register(CommentLike)
-admin.site.register(Payment)
+
 
 
 
