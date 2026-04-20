@@ -342,8 +342,8 @@ class Order(models.Model):
     phone_number = PhoneNumberField(null=True, blank=True)
     address = models.CharField(max_length=500, null=True, blank=True)
     REGION_CHOICES = (
-        ('Ош', 'Ош'),
-        ('Бишкек', 'Бишкек'),
+        ('ОШ', 'ОШ'),
+        ('БИШКЕК', 'БИШКЕК'),
     )
     region = models.CharField(max_length=20, choices=REGION_CHOICES,blank=True,null=True)
 
