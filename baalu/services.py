@@ -7,7 +7,7 @@ from .models import Order, OrderItem
 # ─── Создание заказа из корзины ────────────────────────────────────────────────
 
 @transaction.atomic
-def create_order_from_cart(user, phone_number, address):
+def create_order_from_cart(user, phone_number, address,region):
     if not user.is_authenticated:
         raise ValidationError("Необходимо авторизоваться")
 
@@ -21,6 +21,7 @@ def create_order_from_cart(user, phone_number, address):
         phone_number=phone_number,
         address=address,
         promo_code=cart.promo_code,
+        region=region,
     )
 
     for item in cart.items.select_related('books'):

@@ -412,7 +412,7 @@ class CreateOrderAPIView(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            order = create_order_from_cart(request.user, phone_number, address)
+            order = create_order_from_cart(request.user, phone_number, address,region)
             serializer = OrderSerializer(order)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except DjangoValidationError as e:
