@@ -204,6 +204,7 @@ class BookImages(models.Model):
 class Reklama(models.Model):
     title = models.CharField(max_length=500, null=True, blank=True)
     books_reklama = models.ForeignKey(Books, on_delete=models.CASCADE, related_name='reklama',null=True, blank=True)
+    books_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='reklama_category',null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='reklama_image/', null=True, blank=True)
     link = models.URLField(null=True, blank=True)

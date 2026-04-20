@@ -416,9 +416,10 @@ class ReklamaCreateSerializer(serializers.ModelSerializer):
 class ReklamaListSerializer(serializers.ModelSerializer):
     book_id = serializers.IntegerField(source='books_reklama.id', read_only=True)
     book_name = serializers.CharField(source='books_reklama.books_name', read_only=True)
+    books_category = CategorySimpleListSerializer(read_only=True)
     class Meta:
         model = Reklama
-        fields = ['id', 'title', 'description', 'image', 'link','books_reklama','book_id','book_name']
+        fields = ['id', 'title', 'description', 'image', 'link','books_reklama','book_id','book_name','books_category']
 
 
 class ReklamaDetailSerializer(serializers.ModelSerializer):
