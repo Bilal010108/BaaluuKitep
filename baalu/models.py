@@ -345,7 +345,7 @@ class Order(models.Model):
         ('Ош', 'Ош'),
         ('Бишкек', 'Бишкек'),
     )
-    region = models.CharField(max_length=20, choices=REGION_CHOICES, default='Ожидании')
+    region = models.CharField(max_length=20, choices=REGION_CHOICES,blank=True,null=True)
 
 
 
