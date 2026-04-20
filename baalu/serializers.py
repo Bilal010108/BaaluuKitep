@@ -260,7 +260,7 @@ class SaleListSerializer(serializers.ModelSerializer):
 class SaleDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sale
-        fields = ['is_active', 'description1', 'description2', 'discount_percent', 'start_date', 'end_date']
+        fields = ['is_active', 'discount_percent', 'start_date', 'end_date']
 
 
 class BookCreateSerializer(serializers.ModelSerializer):

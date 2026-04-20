@@ -166,8 +166,6 @@ class Books(models.Model):
 class Sale(models.Model):
     books = models.ForeignKey(Books, on_delete=models.CASCADE, related_name='sales')
     is_active = models.BooleanField(default=True)
-    description1 = models.TextField(null=True,blank=True)
-    description2 = models.TextField(null=True,blank=True)
     discount_percent = models.PositiveSmallIntegerField(
         default=0,
         validators=[MinValueValidator(0), MaxValueValidator(100)]
