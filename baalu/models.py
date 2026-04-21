@@ -102,7 +102,7 @@ class Books(models.Model):
     kolichestvo_stranits = models.IntegerField(null=True, blank=True, verbose_name="Количество страниц")
     format_knigi = models.CharField(max_length=100, null=True, blank=True, verbose_name="Формат")
     age_limit =  models.PositiveSmallIntegerField(validators=[ MinValueValidator(0),MaxValueValidator(90)],null=True, blank=True)
-    pereplet = models.CharField(max_length=16, null=True, blank=True, verbose_name="Переплет")
+    pereplet = models.CharField(max_length=100, null=True, blank=True, verbose_name="Переплет")
     isbn = models.CharField(max_length=64, null=True, blank=True, verbose_name="ISBN")
     yazyk = models.CharField(max_length=64, null=True, blank=True, verbose_name="Язык")
     position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
