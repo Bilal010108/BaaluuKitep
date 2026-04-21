@@ -125,8 +125,16 @@ class SaleAdmin(admin.ModelAdmin):
     list_editable = ['is_active','discount_percent','start_date','end_date']
     list_per_page = 20
 
+
+@admin.register(Reklama)
+class SaleAdmin(admin.ModelAdmin):
+    list_display = ['image', 'position','status',]
+    list_filter = ['status']
+    list_editable = ['position','status',]
+    list_per_page = 20
+
+
 admin.site.register(UserProfile)
-admin.site.register(Reklama)
 admin.site.register(Favorite)
 admin.site.register(FavoriteBook)
 admin.site.register(Cart)
