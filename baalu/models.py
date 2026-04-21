@@ -62,7 +62,7 @@ class Store(models.Model):
         return self.store_name
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=500)
+    category_name = models.CharField(max_length=500,null=True,blank=True)
     position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
 
     def save(self, *args, **kwargs):
@@ -92,6 +92,7 @@ class Books(models.Model):
         ('БИШКЕК', 'БИШКЕК'),
         ('ОШ', 'ОШ'),
         ('Бишкек,Oш', 'Бишкек,Oш'),
+        ('В наличи нет', 'В наличи нет'),
 
     )
     v_nalich = models.CharField(max_length=26,choices= VNALICHI_CHOICES,null=True, blank=True, verbose_name="Наличие")

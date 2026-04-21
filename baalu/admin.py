@@ -96,7 +96,7 @@ class CategoryAdmin(TranslationAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'status', 'total_price', 'created_at','phone_number','address']
+    list_display = ['id', 'user', 'status', 'total_price', 'created_at','phone_number','address','region']
     list_editable = ['status',]
     list_filter = ['status']
     search_fields = ['user__username', 'phone_number', 'address']
