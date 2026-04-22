@@ -63,6 +63,7 @@ urlpatterns = [
 
     path('orders/', UserOrderListAPIView.as_view(), name='order-list'),
     path('orders/create/', CreateOrderAPIView.as_view(), name='order-create'),
+    path('orders/<int:pk>/delete/', UserOrderDeleteAPIView.as_view(), name='order-delete'),
     path('orders/seller/', SellerOrderListView.as_view(), name='seller-order-list'),
     path('orders/seller/<int:pk>/', SellerOrderUpdateView.as_view(), name='seller-order-update'),
 

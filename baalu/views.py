@@ -430,8 +430,15 @@ class SellerOrderListView(generics.ListAPIView):
             items__books__store__store_owner=self.request.user
         ).distinct()
 
+class UserOrderDeleteAPIView(generics.DestroyAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
 
-class SellerOrderUpdateView(generics.RetrieveUpdateAPIView):
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+class SellerOrderUpdateView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
