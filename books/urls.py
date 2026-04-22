@@ -34,9 +34,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = i18n_patterns(
-    path('admin/', admin.site.urls),
+    path('admin_baaluubooks/', admin.site.urls),
     path('', include('baalu.urls')),
-    path('docs/', schema_view.with_ui('swagger', cache_timeout=0),name='schema-swagger-ui'),
+    path('docs_baaluubooks/', schema_view.with_ui('swagger', cache_timeout=0),name='schema-swagger-ui'),
     path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
 
 )+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

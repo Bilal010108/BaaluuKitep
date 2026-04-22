@@ -95,6 +95,7 @@ class LogoutView(generics.GenericAPIView):
 
 class SellerAPIView(generics.ListAPIView):
     serializer_class = SellerSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return UserProfile.objects.filter(id=self.request.user.id)
@@ -102,6 +103,7 @@ class SellerAPIView(generics.ListAPIView):
 
 class ClientAPIView(generics.ListAPIView):
     serializer_class = ClientSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return UserProfile.objects.filter(id=self.request.user.id)
@@ -124,6 +126,7 @@ class StoreListCreateAPIView(generics.ListCreateAPIView):
 
 class StoreListAPIView(generics.ListAPIView):
     serializer_class = StoreListSerializers
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Store.objects.filter(store_owner=self.request.user)
@@ -132,6 +135,7 @@ class StoreListAPIView(generics.ListAPIView):
 class StoreDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StoreDetailSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -435,6 +439,8 @@ class UserOrderDeleteAPIView(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Order.objects.none()
         return Order.objects.filter(user=self.request.user)
 
 
