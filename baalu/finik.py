@@ -122,7 +122,7 @@ def handle_payment_success(pre_payment):
         )
 
         # Регионго жараша байланыш номери
-        our_contact = CONTACT_NUMBERS.get(order.region, '+996 (777) 444-011')
+        our_contact = CONTACT_NUMBERS.get(order.region.upper().strip(), '+996 (777) 444-011')
 
         send_mail(
             subject=f'✅ #{order.id} заказыңыз төлөндү',
