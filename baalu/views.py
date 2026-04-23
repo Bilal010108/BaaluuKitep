@@ -409,19 +409,42 @@ class CreateOrderAPIView(generics.CreateAPIView):
         address = request.data.get('address')
         region = request.data.get('region')
 
-
         if not phone_number or not address or not region:
             return Response(
-                {'error': 'Укажите телефон,регион и адрес доставки'},
+                {'error': 'Укажите телефон, регион и адрес доставки'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            order = create_order_from_cart(request.user, phone_number, address,region)
-            serializer = OrderSerializer(order)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            order = create_order_from_cart(request.user, phone_number, address, region)
+
+            finik = FinikClient()
+            payment_data = finik.create_payment(
+                user=request.user,
+                amount=int(order.total_price),
+                order=order,
+            )
+
+            FinikPrePayment.objects.update_or_create(
+                order=order,
+                defaults={
+                    'user': request.user,
+                    'amount': order.total_price,
+                    'provider_order_id': payment_data.get('payment_id'),
+                    'provider_response': payment_data,
+                    'payment_url': payment_data.get('payment_url'),
+                    'status': FinikPrePayment.Status.REDIRECTED,
+                }
+            )
+
+            return Response({
+                'order': OrderSerializer(order).data,
+                'payment_url': payment_data.get('payment_url'),
+            }, status=status.HTTP_201_CREATED)
+
         except DjangoValidationError as e:
             return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)
-
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
 class SellerOrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer
