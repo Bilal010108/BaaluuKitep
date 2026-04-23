@@ -89,10 +89,10 @@ class Books(models.Model):
     bestseller = models.BooleanField(default=False, verbose_name="Бестселлер")
 
     VNALICHI_CHOICES = (
-        ('Бишкек', 'Бишкекте гана'),
-        ('Ош', 'Ошто гана'),
-        ('ош_бишкек', 'Ошто жана Бишкекте'),
-        ('жок', 'Сатууда жок'),
+        ('Бишкекте гана', 'Бишкекте гана'),
+        ('Ошто гана', 'Ошто гана'),
+        ('Ошто жана Бишкекте', 'Ошто жана Бишкекте'),
+        ('Сатууда жок', 'Сатууда жок'),
 
     )
     v_nalich = models.CharField(max_length=40,choices= VNALICHI_CHOICES,null=True, blank=True, verbose_name="Наличие")
