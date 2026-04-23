@@ -89,13 +89,13 @@ class Books(models.Model):
     bestseller = models.BooleanField(default=False, verbose_name="Бестселлер")
 
     VNALICHI_CHOICES = (
-        ('Только БИШКЕК', 'Только БИШКЕК'),
-        ('только ОШ', 'Только ОШ'),
-        ('Бишкек,Oш', 'Бишкек,Oш'),
-        ('В наличи нет', 'В наличи нет'),
+        ('Бишкек', 'Бишкекте гана'),
+        ('Ош', 'Ошто гана'),
+        ('ош_бишкек', 'Ошто жана Бишкекте'),
+        ('жок', 'Сатууда жок'),
 
     )
-    v_nalich = models.CharField(max_length=26,choices= VNALICHI_CHOICES,null=True, blank=True, verbose_name="Наличие")
+    v_nalich = models.CharField(max_length=40,choices= VNALICHI_CHOICES,null=True, blank=True, verbose_name="Наличие")
     author = models.CharField(max_length=500, null=True, blank=True, verbose_name="Автор")
     izdatelstvo = models.CharField(max_length=500, null=True, blank=True, verbose_name="Издательство")
     god_izdaniya = models.IntegerField(null=True, blank=True, verbose_name="Год издания")
