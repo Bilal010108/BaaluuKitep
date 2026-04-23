@@ -99,21 +99,46 @@ class FinikClient:
         else:
             raise Exception(f"Finik error {resp.status_code}: {resp.text}")
 
+CONTACT_NUMBERS = {
+    'БИШКЕК': '+996 (700) 777-244',
+    'ОШ': '+996 (555) 444-011',
+}
 
 def handle_payment_success(pre_payment):
-    """После успешной оплаты меняем статус заказа и отправляем email."""
     order = pre_payment.order
     if order:
         order.status = 'Оплачен'
         order.save(update_fields=['status'])
 
+        items = order.items.select_related('books').all()
+        items_text = "\n".join([
+            f"  • {item.books.books_name} — {item.quantity} даана x {item.price} сом = {item.total_price} сом"
+            for item in items
+        ])
+
+        promo_text = (
+            f'🎟️ Промокод: {order.promo_code.code} ({order.promo_code.discount_percent}% скидка)\n'
+            if order.promo_code else ''
+        )
+
+        # Регионго жараша байланыш номери
+        our_contact = CONTACT_NUMBERS.get(order.region, '+996 (777) 444-011')
+
         send_mail(
-            subject=f'✅ Заказ #{order.id} оплачен',
+            subject=f'✅ #{order.id} заказыңыз төлөндү',
             message=(
-                f'Привет, {order.user.username}!\n\n'
-                f'Ваш заказ #{order.id} на сумму {order.total_price} сом успешно оплачен.\n'
-                f'Адрес доставки: {order.address}\n\n'
-                f'Спасибо за покупку в Baaluu Books!'
+                f'Саламатсызбы, {order.user.username}!\n\n'
+                f'#{order.id} номерлүү заказыңыз ийгиликтүү төлөндү.\n\n'
+                f'📚 Заказдын курамы:\n{items_text}\n\n'
+                f'💰 Жалпы сумма: {order.total_price} сом\n'
+                f'{promo_text}'
+                f'📍 Жеткирүү дареги: {order.address}\n'
+                f'🏙️ Шаар: {order.region}\n'
+                f'📞 Сиздин номериңиз: {order.phone_number}\n'
+                f'🚚 Жеткирүү мөөнөтү: 1 кундун ичинде\n\n'
+                f'❓ Суроолор болсо биз менен байланышыңыз:\n'
+                f'📱 {our_contact}\n\n'
+                f'Баалуу Китептен сатып алганыңызга чоң рахмат!'
             ),
             from_email=os.getenv('EMAIL_HOST_USER'),
             recipient_list=[order.user.email],
