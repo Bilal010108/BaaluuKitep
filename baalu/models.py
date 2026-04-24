@@ -106,7 +106,7 @@ class Books(models.Model):
     isbn = models.CharField(max_length=64, null=True, blank=True, verbose_name="ISBN")
     yazyk = models.CharField(max_length=64, null=True, blank=True, verbose_name="Язык")
     position = models.PositiveIntegerField(default=0, verbose_name="Позиция",null=True,blank=True)
-    new = models.BooleanField(default=False, verbose_name="Бестселлер",null=True,blank=True)
+    new = models.BooleanField(default=False, verbose_name="New",null=True,blank=True)
 
     @property
     def avg_rating(self):
