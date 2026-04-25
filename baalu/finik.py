@@ -18,7 +18,7 @@ PRIVATE_KEY_PEM  = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAAS
 ACCOUNT_ID = '548e4c5c-814a-402e-93ea-de4350c8b6a3'
 FINIK_MCC = 5999
 WEBHOOK_URL = 'https://api.baaluukitep.com.kg/ru/payment/webhook/'
-REDIRECT_URL = 'https://baaluukitep.kg/'
+REDIRECT_URL = 'https://baaluukitep.kg/my_order'
 
 FINIK_PUBLIC_KEY_PEM = """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuF/PUmhMPPidcMxhZBPb
@@ -101,7 +101,7 @@ class FinikClient:
 
 CONTACT_NUMBERS = {
     'БИШКЕК': '+996 (700) 777-244',
-    'ОШ': '+996 (555) 444-011',
+    'ОШ': '+996 (700) 777-244',
 }
 
 def handle_payment_success(pre_payment):
