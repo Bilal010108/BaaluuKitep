@@ -139,6 +139,7 @@ def handle_payment_success(pre_payment):
                 f'❓ Суроолор болсо биз менен байланышыңыз:\n'
                 f'📱 {our_contact}\n\n'
                 f'Баалуу Китептен сатып алганыңызга чоң рахмат!'
+
             ),
             from_email=os.getenv('EMAIL_HOST_USER'),
             recipient_list=[order.user.email],

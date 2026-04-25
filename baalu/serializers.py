@@ -70,7 +70,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email', 'phone_number', 'password',)
+        fields = ('username','email','phone_number','password','first_name','last_name')
         extra_kwargs = {
             'password': {'write_only': True},
             'username': {'required': True},
@@ -108,6 +108,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             'user': {
                 'username': instance.username,
                 'email': instance.email,
+                'first_name': instance.first_name,
+                'last_name': instance.last_name,
                 'phone_number': str(instance.phone_number),
             },
             'access': str(refresh.access_token),
@@ -334,7 +336,7 @@ class ReviewReplySerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializers(serializers.ModelSerializer):
-    user_reviews = UserProfileReviewSerializers(read_only=True)
+    user_reviews = UserProfileReviewSerializers(source='user', read_only=True)
     likes_count = serializers.ReadOnlyField()
     replies = serializers.SerializerMethodField()
     books  = BooksMiniSerializers(read_only=True)
@@ -347,7 +349,7 @@ class ReviewSerializers(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'user_reviews', 'books', 'rating', 'comment',
-                  'created_at', 'likes_count', 'replies', 'parent', 'books_id')
+                  'created_at', 'likes_count', 'replies', 'parent', 'books_id',)
 
 
     def get_replies(self, obj):
@@ -356,7 +358,7 @@ class ReviewSerializers(serializers.ModelSerializer):
 
 
 class ReviewDetailSerializers(serializers.ModelSerializer):
-    user_reviews = UserProfileReviewSerializers(read_only=True)
+    user_reviews = UserProfileReviewSerializers(source='user', read_only=True)  # ✅
     likes_count = serializers.ReadOnlyField()
     replies = serializers.SerializerMethodField()  # вложенные ответы
 
