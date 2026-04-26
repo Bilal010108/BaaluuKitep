@@ -70,8 +70,9 @@ urlpatterns = [
     path('reviews/', ReviewListAPIView.as_view(), name='review-list'),
     path('reviews/<int:pk>/', ReviewDetailAPIView.as_view(), name='review-detail'),
 
-    path('comments/', CommentListAPIView.as_view(), name='comment-list'),
 
+    path('comments/', CommentListAPIView.as_view(), name='comment-list'),
+    path('comments/<int:pk>/', CommentDetailAPIView.as_view(), name='coment-detail'),
 
     path('orders/<int:order_id>/pay/', CreatePaymentView.as_view(), name='create-payment'),
     path('orders/<int:order_id>/payment-status/', PaymentStatusView.as_view(), name='payment-status'),

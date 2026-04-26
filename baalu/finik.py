@@ -100,8 +100,8 @@ class FinikClient:
             raise Exception(f"Finik error {resp.status_code}: {resp.text}")
 
 CONTACT_NUMBERS = {
-    'БИШКЕК': '+996 (700) 777-244',
-    'ОШ': '+996 (700) 777-244',
+    'БИШКЕК': '+996 (500) 04-02-01',
+    'ОШ': '+996 (500) 04-02-01'
 }
 
 def handle_payment_success(pre_payment):
@@ -122,7 +122,7 @@ def handle_payment_success(pre_payment):
         )
 
         # Регионго жараша байланыш номери
-        our_contact = CONTACT_NUMBERS.get(order.region.upper().strip(), '+996 (777) 444-011')
+        our_contact = CONTACT_NUMBERS.get(order.region.upper().strip(), '+996 (500) 04-02-01')
 
         send_mail(
             subject=f'✅ #{order.id} заказыңыз төлөндү',

@@ -515,6 +515,10 @@ class CommentListAPIView(generics.ListCreateAPIView):
     serializer_class = CommentLikeSerializer
 
 
+class CommentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CommentLike.objects.all()
+    serializer_class = CommentLikeDetailSerializer
+
 
 
 class CreatePaymentView(APIView):
