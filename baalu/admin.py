@@ -103,12 +103,14 @@ class OrderAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ['user', 'books', 'rating', 'created_at']
     list_filter = ['rating']
     search_fields = ['user__username', 'books__books_name']
     list_per_page = 20
+
 
 @admin.register(PromoCode)
 class PromoCodeAdmin(admin.ModelAdmin):
@@ -117,6 +119,7 @@ class PromoCodeAdmin(admin.ModelAdmin):
     list_filter = ['is_used']
     search_fields = ['code']
     list_per_page = 20
+
 
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
@@ -132,6 +135,20 @@ class SaleAdmin(admin.ModelAdmin):
     list_filter = ['status']
     list_editable = ['position','status',]
     list_per_page = 20
+
+    def image_preview(self, obj):
+        image = obj.images.first()
+        if image and image.image:
+            return format_html(
+                '<img src="{}" style="height: 80px;" />',
+                image.image.url
+            )
+        return '—'
+
+    image_preview.short_description = 'Фото'
+
+
+
 
 
 admin.site.register(UserProfile)
